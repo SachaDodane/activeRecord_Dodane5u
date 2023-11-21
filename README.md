@@ -1,1 +1,2 @@
-# activeRecord_Dodane5u_Letondal3u
+Dodane5u
+Letondal3u

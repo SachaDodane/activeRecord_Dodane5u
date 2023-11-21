@@ -12,25 +12,7 @@ public class PrincipaleJDBC {
 
 	public static void main(String[] args) throws SQLException {
 
-		// variables a modifier en fonction de la base
-		String userName = "root";
-		String password = "";
-		String serverName = "localhost";
-		//Attention, sous MAMP, le port est 8889
-		String portNumber = "3306";
-		String tableName = "personne";
-
-		// iL faut une base nommee testPersonne !
-		String dbName = "testpersonne";
-
-		// creation de la connection
-		Properties connectionProps = new Properties();
-		connectionProps.put("user", userName);
-		connectionProps.put("password", password);
-		String urlDB = "jdbc:mysql://" + serverName + ":";
-		urlDB += portNumber + "/" + dbName;
-		Connection connect = DriverManager.getConnection(urlDB, connectionProps);
-
+		Connection connect = (Connection) DBConnection.getConnection();
 		// creation de la table Personne
 		{
 			String createString = "CREATE TABLE Personne ( " + "ID INTEGER  AUTO_INCREMENT, "

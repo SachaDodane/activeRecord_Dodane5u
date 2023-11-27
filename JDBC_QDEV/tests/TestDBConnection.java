@@ -31,7 +31,7 @@ public class TestDBConnection {
 
     @Test
     public void testChangeDB() throws SQLException {
-        DBConnection.setNomDB("deefy");
+        DBConnection.setNomDB("test");
         Connection newConnection = DBConnection.getConnection();
         assertNotSame("Le changement de base de données n'a pas été effectué correctement.", connection1, newConnection);
     }

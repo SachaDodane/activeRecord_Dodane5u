@@ -1,7 +1,4 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +21,7 @@ public class Personne {
         ArrayList<Personne> res = new ArrayList<>();
         try {
             Connection connect = DBConnection.getConnection();
-            String query = "SELECT id, nom, prenom FROM personne";
+            String query = "SELECT id, nom, prenom FROM Personne";
 
             try (PreparedStatement preparedStatement = connect.prepareStatement(query);
                  ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -47,7 +44,7 @@ public class Personne {
 
     public static Personne findById(int id){
         Personne personne = null;
-        String query = "SELECT id, nom, prenom FROM personne where id = ?";
+        String query = "SELECT id, nom, prenom FROM Personne where id = ?";
         try (Connection connect = DBConnection.getConnection();
              PreparedStatement ps = connect.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -69,10 +66,10 @@ public class Personne {
 
     }
 
-    public static List<Personne> findByName(String name){
+    public static ArrayList<Personne> findByName(String name){
         Personne personne = null;
-        List<Personne> res = new ArrayList<>();
-        String query = "SELECT * FROM personne where nom = ?";
+        ArrayList<Personne> res = new ArrayList<>();
+        String query = "SELECT * FROM Personne where nom = ?";
         try (Connection connect = DBConnection.getConnection();
             PreparedStatement ps = connect.prepareStatement(query)){
             ps.setString(1, name);
@@ -90,4 +87,78 @@ public class Personne {
         }
         return res;
     }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public static void createTable(){
+        String query = "CREATE TABLE `Personne` (\n" +
+                "  `id` int(11) PRIMARY KEY NOT NULL,\n" +
+                "  `nom` varchar(40) NOT NULL,\n" +
+                "  `prenom` varchar(40) NOT NULL\n" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+        String query2 = "ALTER TABLE `Personne`\n" +
+                "  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;";
+        try (Connection connect = DBConnection.getConnection();
+             Statement st = connect.createStatement()){
+                st.executeUpdate(query);
+                st.executeUpdate(query2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void deleteTable(){
+        String query = "DROP TABLE IF EXISTS personne;";
+        try (Connection connect = DBConnection.getConnection();
+             Statement st = connect.createStatement()){
+            st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void save(){
+    String query = "INSERT INTO `Personne` (`nom`, `prenom`) VALUES (?, ?)";
+        try (Connection connect = DBConnection.getConnection();
+             PreparedStatement st = connect.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
+            st.setString(1, this.getNom());
+            st.setString(2, this.getPrenom());
+            st.executeUpdate(query);
+            ResultSet clefs = st.getGeneratedKeys();
+            clefs.last();
+            int id = clefs.getInt("id");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete(){
+        String query = "DELETE FROM Personne WHERE id=?";
+        try (Connection connect = DBConnection.getConnection();
+             PreparedStatement st = connect.prepareStatement(query)){
+            st.setInt(1, this.getId());
+            st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

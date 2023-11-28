@@ -136,15 +136,25 @@ public class Personne {
     }
 
     public void save(){
-    String query = "INSERT INTO `Personne` (`nom`, `prenom`) VALUES (?, ?)";
+        String query = "";
+        if (this.id == -1){
+            query = "INSERT INTO `Personne` (`nom`, `prenom`) VALUES (?, ?)";
+        } else{
+            query = "UPDATE Personne SET nom = ?, prenom = ? where id = ?";
+        }
+
         try (Connection connect = DBConnection.getConnection();
              PreparedStatement st = connect.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             st.setString(1, this.getNom());
             st.setString(2, this.getPrenom());
+            if (this.id != -1){
+                st.setInt(3, this.id);
+            }
             st.executeUpdate(query);
             ResultSet clefs = st.getGeneratedKeys();
             clefs.last();
             int id = clefs.getInt("id");
+            this.setId(id);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -156,6 +166,7 @@ public class Personne {
              PreparedStatement st = connect.prepareStatement(query)){
             st.setInt(1, this.getId());
             st.executeUpdate(query);
+            this.setId(-1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
